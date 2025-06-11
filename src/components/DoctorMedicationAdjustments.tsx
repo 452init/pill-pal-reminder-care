@@ -20,6 +20,27 @@ interface DoctorMedicationAdjustmentsProps {
   onUpdateTime: (medicationId: number, newTime: string) => void;
 }
 
+// Helper functions for time conversion
+const convertTo24Hour = (time12h: string): string => {
+  const [time, modifier] = time12h.split(' ');
+  let [hours, minutes] = time.split(':');
+  if (hours === '12') {
+    hours = '00';
+  }
+  if (modifier === 'PM') {
+    hours = (parseInt(hours, 10) + 12).toString();
+  }
+  return `${hours.padStart(2, '0')}:${minutes}`;
+};
+
+const convertTo12Hour = (time24h: string): string => {
+  const [hours, minutes] = time24h.split(':');
+  const hour = parseInt(hours, 10);
+  const ampm = hour >= 12 ? 'PM' : 'AM';
+  const hour12 = hour % 12 || 12;
+  return `${hour12}:${minutes} ${ampm}`;
+};
+
 const DoctorMedicationAdjustments = ({ medications, onUpdateTime }: DoctorMedicationAdjustmentsProps) => {
   const [timeAdjustments, setTimeAdjustments] = useState<{[key: number]: string}>({});
 
@@ -105,7 +126,7 @@ const DoctorMedicationAdjustments = ({ medications, onUpdateTime }: DoctorMedica
                         id={`time-${medication.id}`}
                         type="time"
                         value={getDisplayTime(medication.id, medication.time.includes('AM') || medication.time.includes('PM') ? 
-                          convertTo24Hour(medication.time) : medication.time}
+                          convertTo24Hour(medication.time) : medication.time)}
                         onChange={(e) => handleTimeChange(medication.id, e.target.value)}
                         className="flex-1 text-lg h-12"
                       />
@@ -135,27 +156,6 @@ const DoctorMedicationAdjustments = ({ medications, onUpdateTime }: DoctorMedica
       )}
     </div>
   );
-};
-
-// Helper functions for time conversion
-const convertTo24Hour = (time12h: string): string => {
-  const [time, modifier] = time12h.split(' ');
-  let [hours, minutes] = time.split(':');
-  if (hours === '12') {
-    hours = '00';
-  }
-  if (modifier === 'PM') {
-    hours = (parseInt(hours, 10) + 12).toString();
-  }
-  return `${hours.padStart(2, '0')}:${minutes}`;
-};
-
-const convertTo12Hour = (time24h: string): string => {
-  const [hours, minutes] = time24h.split(':');
-  const hour = parseInt(hours, 10);
-  const ampm = hour >= 12 ? 'PM' : 'AM';
-  const hour12 = hour % 12 || 12;
-  return `${hour12}:${minutes} ${ampm}`;
 };
 
 export default DoctorMedicationAdjustments;
